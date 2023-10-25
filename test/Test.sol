@@ -9,19 +9,18 @@ contract ContractTest is Test {
 
     function setUp() public {
         store = new EtherStore();
-        attack = new Attack(address(store));
-
-        // Deposit 10 ether into store contract
+        
+        // Deposit 10 ether into store contract initially
         store.deposit{value: 10 ether}();
+        
+        attack = new Attack(address(store));
     }
 
     function testReentrancy() public {
-        // Simulate 10 attacks, reducing the balance of EtherStore by 1 ether each time
-        for (uint i = 0; i < 10; i++) {
-            attack.attack{value: 1 ether}();
-        }
+        // Perform a reentrancy attack by depositing 1 ether in the Attack contract
+        attack.attack{value: 1 ether}();
         
-        // Check if the balance of EtherStore is now 0 after 10 attacks
-        assertEq(store.getBalance(), 0, "EtherStore balance should be 0 after 10 attacks");
+        // Check if the balance of EtherStore is now 0 after the reentrancy attack
+        assertEq(store.getBalance(), 0, "EtherStore balance should be 0 after the reentrancy attack");
     }
 }
